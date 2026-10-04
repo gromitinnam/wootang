@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <windows.h>
-#include <wooting-analog-sdk.h>
+#include <wooting_analog_sdk.h>
 
 #define M_PI 3.1415926
 #define PROP 100.0f
@@ -21,13 +21,11 @@ int main() {
     if (!wooting_analog_is_initialised()) {return 1;}
 
     while (1) {
-        wooting_analog_read_full_buffer_device(*analog_buffer);
-        dx = wooting_analog_read_analog(analog_buffer[KEY_D]) - wooting_analog_read_analog(analog_buffer[KEY_A]);
-        dy = wooting_analog_read_analog(analog_buffer[KEY_W]) - wooting_analog_read_analog(analog_buffer[KEY_S]);
+        dx = wooting_analog_read_analog(KEY_D) - wooting_analog_read_analog(KEY_A);
+        dy = wooting_analog_read_analog(KEY_W) - wooting_analog_read_analog(KEY_S);
 
-
-        input.mi.dx = (LONG)(dx * PROP * accel);
-        input.mi.dy = (LONG)(dy * PROP * accel);
+        input.mi.dx = (LONG)(dx * PROP);
+        input.mi.dy = (LONG)(dy * PROP);
         
         SendInput(1, &input, sizeof(INPUT));
 
