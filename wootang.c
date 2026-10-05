@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <windows.h>
-#include <wooting_analog_sdk.h>
+#include "wooting_analog_sdk.h"
 
 #define M_PI 3.1415926
 #define PROP 100.0f

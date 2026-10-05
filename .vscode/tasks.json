@@ -3,25 +3,26 @@
         {
             "type": "cppbuild",
             "label": "C/C++: cl.exe build active file",
-            "command": "cl.exe",
+            "command": "cmd.exe",
             "args": [
+                "/c",
+                "\"C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Auxiliary\\Build\\vcvarsall.bat\"",
+                "x64",
+                "&&",
+                "cl.exe",
                 "/Zi",
-                "/EHsc",
                 "/nologo",
+                "/I${workspaceFolder}\\include",
                 "/Fe${fileDirname}\\${fileBasenameNoExtension}.exe",
                 "${file}",
                 "/link",
-                
-                "I${workspaceFolder}\\include",
-                "L${workspaceFolder}\\lib",
-                "lwooting_analog_sdk_dist"
+                "/LIBPATH:${workspaceFolder}\\lib",
+                "wooting_analog_sdk_dist.dll.lib"
             ],
             "options": {
                 "cwd": "${fileDirname}"
             },
-            "problemMatcher": [
-                "$msCompile"
-            ],
+            "problemMatcher": ["$msCompile"],
             "group": {
                 "kind": "build",
                 "isDefault": true
