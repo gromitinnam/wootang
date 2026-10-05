@@ -2,16 +2,16 @@
 #include <windows.h>
 #include "wooting-analog-sdk.h"
 
-#define PROP 10.0f
+#define PROP 2.0f
 #define POLL_RATE 5
-#define ACCEL_MAX 10.0f
+#define ACCEL_MAX 20.0f
 #define KEY_W 0x1a
 #define KEY_A 0x04
 #define KEY_S 0x16
 #define KEY_D 0x07
 
 #define CURVE 4.0f
-#define LIN2EXPO(x) (x * x * x *CURVE)
+#define LIN2EXPO(x) (x * x * x * CURVE)
 #define GETVAL(x) (x = wooting_analog_read_analog(x))
 
 typedef struct keyput
@@ -64,7 +64,7 @@ int main(void) {
         x.current = dx;
         y.current = dy;
 
-        accel = ((x.current - x.prev) + (y.current - y.prev)) / (float)POLL_RATE;
+        accel = 1 + ((x.current - x.prev) + (y.current - y.prev)) / (float)POLL_RATE;
 
         dx = LIN2EXPO(dx);
         dy = LIN2EXPO(dy);
@@ -72,6 +72,7 @@ int main(void) {
         input.mi.dx = (LONG)(dx * PROP * accel);
         input.mi.dy = (LONG)(dy * PROP * accel);
 
+        SendInput(1, &input, sizeof(input));
         if (SendInput(1, &input, sizeof(input)) == 0) {
             fprintf(stderr, "SendInput failed: %lu\n", GetLastError());
             wooting_analog_uninitialise();
