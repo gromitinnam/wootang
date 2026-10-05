@@ -3,18 +3,29 @@
 #include "wooting-analog-sdk.h"
 
 #define PROP 10.0f
+#define ACCEL_MAX 10.0f
 #define KEY_W 0x1a
 #define KEY_A 0x04
 #define KEY_S 0x16
 #define KEY_D 0x07
 
-#define curve 1.0f
-#define lin2expo(x) (x * (1.0f - curve) + (x * x * x) * curve)
+#define CURVE 4.0f
+#define LIN2EXPO(x) (x * x * CURVE)
+#define GETVAL(x) (x = wooting_analog_read_analog(x))
+
+struct keyput
+{
+    float prev;
+    float current;
+};
+
 
 int main(void) {
-    float dx, dy;
+    float dx, dy, accel;
     float analog_w, analog_a, analog_s, analog_d;
     int init_result;
+    keyput x = {0.0f, 0.0f};
+    keyput y = {0.0f, 0.0f};
     
     INPUT input = {0};
     input.type = INPUT_MOUSE;
@@ -27,11 +38,13 @@ int main(void) {
     }
 
     while (1) {
-        analog_w = wooting_analog_read_analog(KEY_W);
-        analog_a = wooting_analog_read_analog(KEY_A);
-        analog_s = wooting_analog_read_analog(KEY_S);
-        analog_d = wooting_analog_read_analog(KEY_D);
+        //get analog values
+        GETVAL(analog_w);
+        GETVAL(analog_a);
+        GETVAL(analog_s);
+        GETVAL(analog_d);
 
+        //error check
         if (analog_w < 0.0f || analog_a < 0.0f ||
             analog_s < 0.0f || analog_d < 0.0f) {
             fprintf(stderr, "Failed to read analog key values.\n");
@@ -42,11 +55,19 @@ int main(void) {
         dx = analog_d - analog_a;
         dy = analog_s - analog_w;
 
-        dx = lin2expo(dx);
-        dy = lin2expo(dy);
+        //mouse accel
+        x.prev = x.current;
+        y.prev = y.current;
+        x.current = dx;
+        y.current = dy;
 
-        input.mi.dx = (LONG)(dx * PROP);
-        input.mi.dy = (LONG)(dy * PROP);
+        accel = ((x.current - x.prev) + (y.current - y.prev)) / 5.0f;
+
+        dx = LIN2EXPO(dx);
+        dy = LIN2EXPO(dy);
+
+        input.mi.dx = (LONG)(dx * PROP * (dx * accel > ACCEL_MAX ? ACCEL_MAX : dx * accel));
+        input.mi.dy = (LONG)(dy * PROP * (dy * accel > ACCEL_MAX ? ACCEL_MAX : dy * accel));
 
         if (SendInput(1, &input, sizeof(input)) == 0) {
             fprintf(stderr, "SendInput failed: %lu\n", GetLastError());
