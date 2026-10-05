@@ -11,7 +11,7 @@
 #define KEY_D 0x07
 
 #define CURVE 4.0f
-#define LIN2EXPO(x) (x * x * CURVE)
+#define LIN2EXPO(x) (x * x * x *CURVE)
 #define GETVAL(x) (x = wooting_analog_read_analog(x))
 
 typedef struct keyput
@@ -42,10 +42,10 @@ int main(void) {
 
     while (1) {
         //get analog values
-        GETVAL(analog_w);
-        GETVAL(analog_a);
-        GETVAL(analog_s);
-        GETVAL(analog_d);
+        analog_w = wooting_analog_read_analog(KEY_W);
+        analog_a = wooting_analog_read_analog(KEY_A);
+        analog_s = wooting_analog_read_analog(KEY_S);
+        analog_d = wooting_analog_read_analog(KEY_D);
 
         //error check
         if (analog_w < 0.0f || analog_a < 0.0f ||
@@ -69,8 +69,8 @@ int main(void) {
         dx = LIN2EXPO(dx);
         dy = LIN2EXPO(dy);
 
-        input.mi.dx = (LONG)(dx * PROP * (dx * accel > ACCEL_MAX ? ACCEL_MAX : dx * accel));
-        input.mi.dy = (LONG)(dy * PROP * (dy * accel > ACCEL_MAX ? ACCEL_MAX : dy * accel));
+        input.mi.dx = (LONG)(dx * PROP * accel);
+        input.mi.dy = (LONG)(dy * PROP * accel);
 
         if (SendInput(1, &input, sizeof(input)) == 0) {
             fprintf(stderr, "SendInput failed: %lu\n", GetLastError());
