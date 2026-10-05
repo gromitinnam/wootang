@@ -11,8 +11,8 @@
 #define KEY_D 0x07
 
 #define CURVE 4.0f
-#define LIN2EXPO(x) (x * x * x * CURVE)
-#define GETVAL(x) (x = wooting_analog_read_analog(x))
+#define LIN2EXPO(x) (x * x * x * CURVE) //3rd order exponential curve, looks like theres a deadzone for small values, fix low gain on low values
+
 
 typedef struct keyput
 {
