@@ -18,7 +18,7 @@ typedef struct keyput
 {
     float prev;
     float current;
-};
+} keyput;
 
 
 int main(void) {
@@ -58,7 +58,6 @@ int main(void) {
         dx = analog_d - analog_a;
         dy = analog_s - analog_w;
 
-<<<<<<< HEAD
         //mouse accel
         x.prev = x.current;
         y.prev = y.current;
@@ -72,13 +71,6 @@ int main(void) {
 
         input.mi.dx = (LONG)(dx * PROP * accel);
         input.mi.dy = (LONG)(dy * PROP * accel);
-=======
-        dx = lin2expo(dx * PROP);
-        dy = lin2expo(dy* PROP);
-
-        input.mi.dx = (LONG)(dx);
-        input.mi.dy = (LONG)(dy);
->>>>>>> 5052ad942b6087969a14963e45f0b40974e0666b
 
         if (SendInput(1, &input, sizeof(input)) == 0) {
             fprintf(stderr, "SendInput failed: %lu\n", GetLastError());
