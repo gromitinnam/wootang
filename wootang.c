@@ -3,6 +3,7 @@
 #include "wooting-analog-sdk.h"
 
 #define PROP 10.0f
+#define POLL_RATE 5
 #define ACCEL_MAX 10.0f
 #define KEY_W 0x1a
 #define KEY_A 0x04
@@ -13,7 +14,7 @@
 #define LIN2EXPO(x) (x * x * CURVE)
 #define GETVAL(x) (x = wooting_analog_read_analog(x))
 
-struct keyput
+typedef struct keyput
 {
     float prev;
     float current;
@@ -21,16 +22,18 @@ struct keyput
 
 
 int main(void) {
+    //initialize variables
     float dx, dy, accel;
     float analog_w, analog_a, analog_s, analog_d;
     int init_result;
     keyput x = {0.0f, 0.0f};
     keyput y = {0.0f, 0.0f};
-    
+    //windows stuff
     INPUT input = {0};
     input.type = INPUT_MOUSE;
     input.mi.dwFlags = MOUSEEVENTF_MOVE;
 
+    //code
     init_result = wooting_analog_initialise();
     if (init_result < 0 || !wooting_analog_is_initialised()) {
         fprintf(stderr, "Failed to initialize Wooting Analog SDK: %d\n", init_result);
@@ -61,7 +64,7 @@ int main(void) {
         x.current = dx;
         y.current = dy;
 
-        accel = ((x.current - x.prev) + (y.current - y.prev)) / 5.0f;
+        accel = ((x.current - x.prev) + (y.current - y.prev)) / (float)POLL_RATE;
 
         dx = LIN2EXPO(dx);
         dy = LIN2EXPO(dy);
@@ -75,6 +78,6 @@ int main(void) {
             return 1;
         }
 
-        Sleep(5);
+        Sleep(POLL_RATE);
     }
 }
