@@ -4,7 +4,7 @@
 
 #define PROP 10.0f
 #define POLL_RATE 5
-#define ACCEL_MAX 10.0f
+#define ACCEL_MAX 30.0f
 #define KEY_W 0x1a
 #define KEY_A 0x04
 #define KEY_S 0x16
