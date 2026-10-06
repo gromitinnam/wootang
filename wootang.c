@@ -72,7 +72,6 @@ int main(void) {
         input.mi.dx = (LONG)(dx * PROP * accel);
         input.mi.dy = (LONG)(dy * PROP * accel);
 
-        SendInput(1, &input, sizeof(input));
         if (SendInput(1, &input, sizeof(input)) == 0) {
             fprintf(stderr, "SendInput failed: %lu\n", GetLastError());
             wooting_analog_uninitialise();
