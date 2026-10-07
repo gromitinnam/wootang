@@ -11,7 +11,8 @@
 #define KEY_D 0x07
 
 #define CURVE 4.0f
-#define LIN2EXPO(x) (x * x * x * CURVE) //3rd order exponential curve, looks like theres a deadzone for small values, fix low gain on low values
+#define LINEAR 1.0f
+#define LIN2EXPO(x) (x * x * x * CURVE * LINEAR * x) //3rd order exponential curve, looks like theres a deadzone for small values, fix low gain on low values
 
 
 typedef struct keyput
