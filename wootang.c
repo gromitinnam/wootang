@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <time.h>
 #include <windows.h>
 #include "wooting-analog-sdk.h"
 
@@ -12,8 +13,7 @@
 
 #define CURVE 4.0f
 #define LINEAR 1.0f
-#define LIN2EXPO(x) (x * x * x * CURVE * LINEAR * x) //3rd order exponential curve, looks like theres a deadzone for small values, fix low gain on low values
-
+#define LIN2EXPO(x) (x * x  * CURVE * LINEAR * x)
 
 typedef struct keyput
 {
@@ -24,7 +24,8 @@ typedef struct keyput
 
 int main(void) {
     //initialize variables
-    float dx, dy, accel;
+
+    float dx, dy; float accel = 1.0f; //default accel value
     float analog_w, analog_a, analog_s, analog_d;
     int init_result;
     keyput x = {0.0f, 0.0f};
@@ -42,6 +43,8 @@ int main(void) {
     }
 
     while (1) {
+        clock_t start = clock(), dt;
+
         //get analog values
         analog_w = wooting_analog_read_analog(KEY_W);
         analog_a = wooting_analog_read_analog(KEY_A);
@@ -65,7 +68,7 @@ int main(void) {
         x.current = dx;
         y.current = dy;
 
-        accel = 1 + ((x.current - x.prev) + (y.current - y.prev)) / (float)POLL_RATE;
+        accel = 1 + ((x.current - x.prev) + (y.current - y.prev)) / (float)dt;
 
         dx = LIN2EXPO(dx);
         dy = LIN2EXPO(dy);
@@ -78,7 +81,9 @@ int main(void) {
             wooting_analog_uninitialise();
             return 1;
         }
+        
 
         Sleep(POLL_RATE);
+        dt = clock() - start;
     }
 }
