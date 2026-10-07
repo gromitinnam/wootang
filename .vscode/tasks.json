@@ -12,6 +12,7 @@
                 "-Command",
                 "$ErrorActionPreference = 'Stop'; $workspace = '${workspaceFolder}'; $programFilesX86 = [Environment]::GetFolderPath('ProgramFilesX86'); $vswhere = Join-Path $programFilesX86 'Microsoft Visual Studio\\Installer\\vswhere.exe'; if (-not (Test-Path $vswhere)) { throw 'vswhere.exe was not found. Install Visual Studio with Desktop development with C++.' }; $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath; if (-not $vs) { throw 'No Visual Studio installation with the C++ x64 tools was found.' }; $devCmd = Join-Path $vs 'VC\\Auxiliary\\Build\\vcvars64.bat'; if (-not (Test-Path $devCmd)) { throw \"MSVC environment script not found: $devCmd\" }; $build = 'call \"' + $devCmd + '\" && cl.exe /nologo /W4 /TC /I\"' + $workspace + '\\include\" /Fe\"' + $workspace + '\\wootang.exe\" \"' + $workspace + '\\wootang.c\" /link /LIBPATH:\"' + $workspace + '\\lib\" wooting_analog_sdk_dist.dll.lib user32.lib'; & cmd.exe /d /s /c $build; exit $LASTEXITCODE"
             ],
+
             "options": {
                 "cwd": "${workspaceFolder}"
             },
@@ -22,6 +23,25 @@
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "type": "process",
+            "label": "Generate Assembly Listing",
+            "command": "powershell.exe",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-Command",
+                "$ErrorActionPreference = 'Stop'; $workspace = '${workspaceFolder}'; $source = '${file}'; if ([IO.Path]::GetExtension($source) -ne '.c') { throw 'Open a C source file before generating an assembly listing.' }; $include = Join-Path $workspace 'include'; $assembly = [IO.Path]::ChangeExtension($source, '.asm'); $programFilesX86 = [Environment]::GetFolderPath('ProgramFilesX86'); $vswhere = Join-Path $programFilesX86 'Microsoft Visual Studio\\Installer\\vswhere.exe'; if (-not (Test-Path $vswhere)) { throw 'vswhere.exe was not found. Install Visual Studio with Desktop development with C++.' }; $vs = & $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath; if (-not $vs) { throw 'No Visual Studio installation with the C++ x64 tools was found.' }; $devCmd = Join-Path $vs 'VC\\Auxiliary\\Build\\vcvars64.bat'; if (-not (Test-Path $devCmd)) { throw \"MSVC environment script not found: $devCmd\" }; $build = 'call \"' + $devCmd + '\" && cl.exe /nologo /O2 /FAs /c /TC /I\"' + $include + '\" /Fa\"' + $assembly + '\" \"' + $source + '\"'; & cmd.exe /d /s /c $build; exit $LASTEXITCODE"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ],
+            "group": "build"
         }
     ]
 }

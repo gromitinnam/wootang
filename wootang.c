@@ -24,7 +24,7 @@ typedef struct keyput
 
 int main(void) {
     //initialize variables
-
+    static clock_t start, dt;
     float dx, dy; float accel = 1.0f; //default accel value
     float analog_w, analog_a, analog_s, analog_d;
     int init_result;
@@ -43,7 +43,7 @@ int main(void) {
     }
 
     while (1) {
-        clock_t start = clock(), dt;
+        start = clock(), dt;
 
         //get analog values
         analog_w = wooting_analog_read_analog(KEY_W);
